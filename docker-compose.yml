@@ -1,0 +1,49 @@
+version: '3'
+services:
+
+  mysql:
+    container_name: mysqldb
+    image: mysql
+    env_file:
+      - ./backend/.mysqlenv
+    networks:
+      - spring-net
+    ports:
+      - "3307:3306"
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    image: backend
+    ports:
+      - "9090:8080"
+    depends_on:
+      - mysql
+    env_file:
+      - ./backend/.env
+    networks:
+      - spring-net
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    image: frontend
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env
+    networks:
+      - spring-net
+
+
+networks:
+  spring-net:
+    name: spring-net
+    external: true
+
